@@ -175,8 +175,12 @@ def save_undo(kind,snapshot):
 
 
 def undo_available(kind):
-    try:return kind in json.loads((STATE/'undo-lighting.json').read_text())
-    except (OSError,ValueError):return False
+    try:
+        saved=json.loads((STATE/'undo-lighting.json').read_text())
+        if kind not in saved:return False
+        if kind=='mouse':mouse_lighting_sequence(saved[kind]['config'])
+        return True
+    except (OSError,ValueError,KeyError,TypeError):return False
 
 
 def undo_lighting(kind):

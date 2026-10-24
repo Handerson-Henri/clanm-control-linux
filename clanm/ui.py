@@ -160,7 +160,7 @@ class Window(Gtk.Window):
     def mouse_page(self):
         scroll,box=self.page()
         box.pack_start(label('Iluminação do mouse','section'),False,False,0)
-        box.pack_start(label('Escolha um efeito nativo e ajuste sua iluminação. DPI, sensibilidade e botões ficam fora destas ações.','sub'),False,False,0)
+        box.pack_start(label('Ajuste a cor fixa ou apague os LEDs. DPI, sensibilidade e botões ficam fora destas ações.','sub'),False,False,0)
         self.mpreview=self.preview(box,'mouse')
         grid=self.grid(box)
         self.m['mode']=combo(MOUSE_LIGHT_EFFECTS);self.row(grid,0,'Iluminação',self.m['mode'])
@@ -172,7 +172,7 @@ class Window(Gtk.Window):
         self.mouse_hint=label('','sub');box.pack_start(self.mouse_hint,False,False,0)
         self.m['mode'].connect('changed',lambda *_:self.mouse_capabilities())
         self.mouse_capabilities()
-        box.pack_start(label('Novos efeitos e ritmos ainda precisam de conferência visual no seu mouse. As animações são executadas pelo próprio dispositivo.','sub'),False,False,0)
+        box.pack_start(label('Efeitos animados bloqueados: houve perda de ponteiro e cliques durante um teste. Use somente cor fixa ou LEDs desligados.','sub'),False,False,0)
         self.mapply=Gtk.Button(label='Aplicar no mouse');self.mapply.get_style_context().add_class('suggested-action');self.mapply.connect('clicked',lambda *_:self.apply('mouse'))
         self.action_bar(box,'mouse',self.mapply)
         return scroll
@@ -199,7 +199,7 @@ class Window(Gtk.Window):
         box.pack_start(label('Recuperar uma alteração','section'),False,False,0)
         box.pack_start(label('Voltar ao azul testado muda somente a iluminação para azul fixo. Desfazer restaura a iluminação anterior salva nesta versão: leitura real de oito parâmetros no teclado, ou última iluminação enviada pelo aplicativo no mouse. Não há cópia do estado original de fábrica. Desfazer começa a ficar disponível após uma alteração feita nesta versão.','sub'),False,False,0)
         box.pack_start(label('Sobre esta versão','section'),False,False,0)
-        box.pack_start(label('Versão 0.4 · aplicativo comunitário independente. RGB do teclado baseado no protocolo Evision, adaptado ao CL-TK87. Mouse com codificação CL-MK043 identificada no software oficial. Sem atualização de firmware, captura de digitação ou serviço em segundo plano.','sub'),False,False,0)
+        box.pack_start(label('Versão 0.4.1 · aplicativo comunitário independente. RGB do teclado baseado no protocolo Evision, adaptado ao CL-TK87. Mouse com codificação CL-MK043 identificada no software oficial. Sem atualização de firmware, captura de digitação ou serviço em segundo plano.','sub'),False,False,0)
         return scroll
 
     def values(self):

@@ -76,10 +76,17 @@ class RecoveryTests(unittest.TestCase):
         with self.assertRaises(ValueError):backend.undo_lighting('mouse')
 
     def test_mouse_undo_preserves_effect_speed_and_brightness(self):
-        previous={'mode':'Respiração','color':'#ff0000','speed':4,'brightness':100}
+        previous={'mode':'Cor fixa','color':'#ff0000','speed':4,'brightness':100}
         backend.save_applied('mouse',previous)
         self.assertEqual(backend.last_lighting('mouse'),previous)
         backend.save_undo('mouse',{'config':previous})
         with patch.object(backend,'send_mouse_lighting') as send:
             backend.undo_lighting('mouse')
             self.assertEqual(send.call_args.args[0],previous)
+
+    def test_unsafe_mouse_undo_is_disabled_and_cannot_write(self):
+        backend.save_undo('mouse',{'config':{'mode':'Respiração','color':'#ff0000','speed':2,'brightness':255}})
+        self.assertFalse(backend.undo_available('mouse'))
+        with patch.object(backend,'send_mouse_lighting') as send:
+            with self.assertRaises(ValueError):backend.undo_lighting('mouse')
+            send.assert_not_called()

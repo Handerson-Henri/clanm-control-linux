@@ -44,3 +44,9 @@ class MouseEffectsTests(unittest.TestCase):
         with patch.object(backend,'send_mouse_lighting') as send:
             backend.apply_mouse(legacy)
             self.assertEqual(send.call_args.args[0],explicit)
+
+    def test_animated_effects_are_blocked_before_usb_access(self):
+        for mode in ('Respiração','Neon','Onda','Reativo','Rastro','Vai e volta','Deslizar','Ioiô','Mármore','Estrela cadente'):
+            with self.subTest(mode=mode), patch.object(backend,'detect') as detect:
+                with self.assertRaises(ValueError):backend.apply_mouse(dict(mode=mode,color='#ff0000',brightness=255,speed=2))
+                detect.assert_not_called()

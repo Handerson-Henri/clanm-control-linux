@@ -1,4 +1,6 @@
-# Clanm Control Linux 0.4
+# Clanm Control Linux 0.4.1
+
+**Correção 0.4.1:** efeitos animados do mouse foram bloqueados após relato de perda de ponteiro e cliques. Use cor fixa ou desligado. A causa ainda está em investigação; testes de pacotes não validaram o comportamento físico. Não use a versão 0.4.0.
 
 Aplicativo GTK em português para iluminação do teclado Clanm CL-TK87 e do mouse MK043. Não depende de Wine nem executa o software Windows.
 
@@ -27,7 +29,7 @@ Se precisar, clique em **Liberar acesso USB**. A autenticação ocorre na janela
 | Dispositivo | Identificador USB | Disponível | Confirmado fisicamente |
 |---|---|---|---|
 | Clanm CL-TK87 | `320f:5078` | Cor, brilho, efeitos, velocidade, direção; leitura e cópia dos parâmetros de luz | Azul e vermelho fixos |
-| Clanm CL-MK043 / MK043 | `04d9:a09f` | 12 modos, incluindo desligado; brilho e velocidade conforme o efeito | Azul, vermelho e LEDs desligados ao longo do desenvolvimento |
+| Clanm CL-MK043 / MK043 | `04d9:a09f` | Cor fixa ou desligado; efeitos animados bloqueados | Azul, vermelho e LEDs desligados ao longo do desenvolvimento |
 
 Identificadores podem ser compartilhados entre modelos. O suporte foi testado neste kit, sem garantia para todo periférico com o mesmo VID/PID. Não inclui controle de DPI, macros, remapeamento de teclas, firmware ou alteração de botões.
 
@@ -95,12 +97,8 @@ A interface adapta o Design System do Prints & Paints: paleta índigo, fonte Int
 
 Contribuições e relatos de teste são bem-vindos. Leia [CONTRIBUTING.md](CONTRIBUTING.md). Projeto independente, sem vínculo oficial com a Clanm. Não inclui programas proprietários do fabricante.
 
-## Efeitos do mouse na versão 0.4
+## Efeitos do mouse: suspensos na 0.4.1
 
-![Controles de efeitos do mouse](preview-mouse.png)
+A versão 0.4.0 foi retirada da indicação de uso após o usuário relatar que aplicar outro efeito parou ponteiro e cliques; voltar à cor fixa recuperou o mouse. O histórico local indica Respiração, brilho 255 e velocidade 2. O kernel registrou resets USB e aviso de interface não reivindicada; a causa exata ainda não foi estabelecida.
 
-Além de cor fixa e desligado: Respiração, Neon, Onda, Reativo, Rastro, Vai e volta, Deslizar, Ioiô, Mármore e Estrela cadente. O controle de velocidade vai de **0 (lenta) a 4 (rápida)** e só fica disponível nos modos que o protocolo permite. Brilho vai de 0 a 255; Rastro e Vai e volta não oferecem esse ajuste no comando usado.
-
-Selecione **Respiração**, uma cor e a velocidade; clique em **Aplicar no mouse**. Compare os níveis 0 e 4. Selecionar controles não envia comandos. Use **Desfazer última iluminação** ou **Voltar ao azul testado** para recuperar a iluminação. Perfis JSON também guardam brilho e velocidade; perfis antigos continuam aceitos, com brilho 255 e velocidade 2 quando ausentes.
-
-Os novos efeitos seguem os campos do software oficial CL-MK043, conferidos por análise estática e testes de pacotes. **Ainda não foram confirmados visualmente no hardware.** Alguns modos usam a paleta que já existe no mouse; esta versão não regrava paletas. Não há animação por serviço em segundo plano: o próprio mouse executa o efeito.
+A versão 0.4.1 permite somente cor fixa e desligado. Perfis animados são recusados antes do acesso USB, inclusive pelo botão Desfazer. O controle de velocidade fica desativado. O teclado conserva seus controles anteriores. A correção não envia comandos automaticamente e não tenta novos testes físicos.

@@ -114,13 +114,9 @@ def mouse_sequence(config):
 
 
 # Numeração do CL-MK043 oficial; não confundir com tabelas de outras variantes.
-MOUSE_LIGHT_EFFECTS = {
-    'Cor fixa':1, 'Desligado':0, 'Respiração':2, 'Neon':3, 'Onda':4,
-    'Reativo':5, 'Rastro':6, 'Vai e volta':7, 'Deslizar':8,
-    'Ioiô':9, 'Mármore':10, 'Estrela cadente':11,
-}
-MOUSE_SPEED_MODES = {2,3,4,6,7,9,10}
-MOUSE_BRIGHTNESS_MODES = {1,2,3,4,5,8,9,10,11}
+MOUSE_LIGHT_EFFECTS = {'Cor fixa':1, 'Desligado':0}
+MOUSE_SPEED_MODES = set()
+MOUSE_BRIGHTNESS_MODES = {1}
 
 
 def mouse_lighting_sequence(config):
@@ -129,7 +125,7 @@ def mouse_lighting_sequence(config):
     if not {'mode','color'} <= set(config) or set(config)-{'mode','color','speed','brightness'}:
         raise ValueError('A iluminação aceita somente modo, cor, brilho e velocidade.')
     try:mode=MOUSE_LIGHT_EFFECTS[config['mode']]
-    except (KeyError,TypeError) as exc:raise ValueError('Efeito de iluminação desconhecido.') from exc
+    except (KeyError,TypeError) as exc:raise ValueError('Efeito bloqueado: os modos animados foram retirados após falha do mouse. Use Cor fixa ou Desligado.') from exc
     speed=config.get('speed',2);brightness=config.get('brightness',255)
     if type(speed) is not int or not 0<=speed<=4:
         raise ValueError('A velocidade deve ser um nível inteiro de 0 a 4.')

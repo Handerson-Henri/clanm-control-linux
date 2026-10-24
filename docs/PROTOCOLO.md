@@ -71,3 +71,9 @@ Parâmetros decodificados do registro 0D (bytes 1–3), com velocidade `s` entre
 | 10 | modo, b, 4-s |
 
 O comprimento de rastro é intermediário (2). Seletores de cor ficam em zero; modos que usam paleta dependem da paleta já gravada. A velocidade segue o slider lento–rápido do programa oficial, incluindo campos invertidos. A conferência atual cobre codificação, checksum, limites, importação antiga e comandos permitidos; não confirma aparência ou ritmo físico desses novos modos. Nenhum comando de hardware foi enviado para produzir esta revisão.
+
+## Incidente e contenção 0.4.1
+
+Após aplicar efeito novo, o usuário relatou perda de ponteiro e cliques; recuperar cor fixa restaurou o mouse. O último registro local é Respiração, brilho 255, velocidade 2. Há resets USB e aviso de interface não reivindicada no kernel. Isso não isola a causa. A hipótese de que os campos extraídos seriam suficientes para ativar animações não foi confirmada no hardware.
+
+Todos os efeitos animados foram bloqueados no caminho ativo, antes do transporte, incluindo perfis importados e recuperação. A lista pública contém apenas fixo e desligado. Velocidade desativada. Nenhum comando de teste foi enviado nesta contenção.
