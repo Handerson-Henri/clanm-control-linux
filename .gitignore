@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.venv/
+*.zip
+*.deb
+*.exe
+*.dll
+*.pcap*
+last-applied.json
+
+# Dados locais e artefatos de pesquisa nunca são publicados.
+.env
+.env.*
+*.db
+*.db-*
+*.log
+undo-lighting.json
+appearance.json
+credentials*
+tokens*
+work/
