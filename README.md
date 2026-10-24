@@ -1,4 +1,4 @@
-# Clanm Control Linux 0.3
+# Clanm Control Linux 0.4
 
 Aplicativo GTK em português para iluminação do teclado Clanm CL-TK87 e do mouse MK043. Não depende de Wine nem executa o software Windows.
 
@@ -27,7 +27,7 @@ Se precisar, clique em **Liberar acesso USB**. A autenticação ocorre na janela
 | Dispositivo | Identificador USB | Disponível | Confirmado fisicamente |
 |---|---|---|---|
 | Clanm CL-TK87 | `320f:5078` | Cor, brilho, efeitos, velocidade, direção; leitura e cópia dos parâmetros de luz | Azul e vermelho fixos |
-| Clanm CL-MK043 / MK043 | `04d9:a09f` | Cor fixa ou LEDs desligados; aplicação limitada à iluminação | Azul, vermelho e LEDs desligados ao longo do desenvolvimento |
+| Clanm CL-MK043 / MK043 | `04d9:a09f` | 12 modos, incluindo desligado; brilho e velocidade conforme o efeito | Azul, vermelho e LEDs desligados ao longo do desenvolvimento |
 
 Identificadores podem ser compartilhados entre modelos. O suporte foi testado neste kit, sem garantia para todo periférico com o mesmo VID/PID. Não inclui controle de DPI, macros, remapeamento de teclas, firmware ou alteração de botões.
 
@@ -42,7 +42,7 @@ Também oferece [tema claro](preview-light.png). Ações de aplicação e recupe
 Em cada dispositivo existem dois botões:
 
 - **Voltar ao azul testado:** aplica iluminação azul fixa. No mouse, envia somente comandos de luz. É um perfil de recuperação; **não é reset de fábrica**.
-- **Desfazer última iluminação:** restaura a cópia anterior salva pela versão 0.2. No teclado, a cópia vem da leitura dos parâmetros reais antes da escrita; no mouse, vem do último modo/cor registrado pelo aplicativo. Fica indisponível até haver uma cópia. Não recupera o estado anterior à primeira instalação.
+- **Desfazer última iluminação:** restaura a cópia anterior salva pela versão 0.2. No teclado, a cópia vem da leitura dos parâmetros reais antes da escrita; no mouse, vem do última iluminação registrada pelo aplicativo. Fica indisponível até haver uma cópia. Não recupera o estado anterior à primeira instalação.
 
 Não tínhamos uma cópia da configuração original de fábrica. Por isso, o aplicativo não oferece uma falsa restauração de fábrica nem promete que retirar o cabo desfaça mudanças persistentes.
 
@@ -62,7 +62,7 @@ A versão 0.2 salva os oito parâmetros atuais antes de enviar uma alteração, 
 
 Detectado por `04d9:a09f`, configuração pela interface USB 2. A versão 0.1 teve apagar LEDs e azul fixo confirmados pelo usuário, mas enviava o perfil completo.
 
-**Na versão 0.2, DPI, sensibilidade, taxa de consulta, LOD e botões foram retirados da interface e do caminho de aplicação.** O backend recusa perfis completos nessa operação. Aplica somente cor fixa ou desligado, por dois comandos RGB/efeito, sem escrever paletas ou registros de desempenho.
+**Na versão 0.2, DPI, sensibilidade, taxa de consulta, LOD e botões foram retirados da interface e do caminho de aplicação.** O backend recusa perfis completos nessa operação. Aplica somente iluminação, por dois comandos RGB/efeito, sem escrever paletas ou registros de desempenho.
 
 O caminho de iluminação foi conferido por análise estática, testes simulados e pelo usuário, que confirmou vermelho nos dois dispositivos. Nenhum comando USB foi enviado durante a revisão visual 0.3. A configuração original de fábrica e o DPI anterior à versão 0.1 não foram capturados, portanto não podem ser reconstruídos a partir destes arquivos.
 
@@ -94,3 +94,13 @@ A interface adapta o Design System do Prints & Paints: paleta índigo, fonte Int
 ## Comunidade
 
 Contribuições e relatos de teste são bem-vindos. Leia [CONTRIBUTING.md](CONTRIBUTING.md). Projeto independente, sem vínculo oficial com a Clanm. Não inclui programas proprietários do fabricante.
+
+## Efeitos do mouse na versão 0.4
+
+![Controles de efeitos do mouse](preview-mouse.png)
+
+Além de cor fixa e desligado: Respiração, Neon, Onda, Reativo, Rastro, Vai e volta, Deslizar, Ioiô, Mármore e Estrela cadente. O controle de velocidade vai de **0 (lenta) a 4 (rápida)** e só fica disponível nos modos que o protocolo permite. Brilho vai de 0 a 255; Rastro e Vai e volta não oferecem esse ajuste no comando usado.
+
+Selecione **Respiração**, uma cor e a velocidade; clique em **Aplicar no mouse**. Compare os níveis 0 e 4. Selecionar controles não envia comandos. Use **Desfazer última iluminação** ou **Voltar ao azul testado** para recuperar a iluminação. Perfis JSON também guardam brilho e velocidade; perfis antigos continuam aceitos, com brilho 255 e velocidade 2 quando ausentes.
+
+Os novos efeitos seguem os campos do software oficial CL-MK043, conferidos por análise estática e testes de pacotes. **Ainda não foram confirmados visualmente no hardware.** Alguns modos usam a paleta que já existe no mouse; esta versão não regrava paletas. Não há animação por serviço em segundo plano: o próprio mouse executa o efeito.

@@ -23,7 +23,7 @@ Diga o nível da validação: pacote gerado, USB aceitou, leitura retornou, resu
 ## Contratos do hardware
 
 - Abrir, escolher cor e carregar perfil não podem escrever no dispositivo.
-- O caminho público do mouse aceita somente modo/cor e comandos de iluminação. Não reintroduza envio de perfil completo para alterar apenas LEDs.
+- O caminho público do mouse aceita somente modo, cor, brilho e velocidade e comandos de iluminação. Não reintroduza envio de perfil completo para alterar apenas LEDs.
 - Preserve os drivers de entrada; não resete o dispositivo nem remova as interfaces principais do kernel.
 - Antes de uma alteração no teclado, preserve os parâmetros de luz que podem ser lidos e permita recuperação.
 - Não chame perfil de exemplo de padrão de fábrica sem evidência do fabricante ou leitura original verificada.

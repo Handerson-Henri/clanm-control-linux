@@ -113,18 +113,39 @@ def mouse_sequence(config):
     return operations
 
 
+# Numeração do CL-MK043 oficial; não confundir com tabelas de outras variantes.
+MOUSE_LIGHT_EFFECTS = {
+    'Cor fixa':1, 'Desligado':0, 'Respiração':2, 'Neon':3, 'Onda':4,
+    'Reativo':5, 'Rastro':6, 'Vai e volta':7, 'Deslizar':8,
+    'Ioiô':9, 'Mármore':10, 'Estrela cadente':11,
+}
+MOUSE_SPEED_MODES = {2,3,4,6,7,9,10}
+MOUSE_BRIGHTNESS_MODES = {1,2,3,4,5,8,9,10,11}
+
+
 def mouse_lighting_sequence(config):
-    """Somente os registradores RGB 0C e efeito 0D. Sem DPI, botões ou paletas."""
+    """Somente RGB 0C e efeito 0D. Nunca DPI, botões ou paletas."""
     from .mouse_codec import encode
-    if set(config) != {'mode','color'}:
-        raise ValueError('A operação de iluminação aceita somente modo e cor.')
-    if config['mode'] not in ('Cor fixa','Desligado'):
-        raise ValueError('Nesta versão, use Cor fixa ou Desligado no mouse.')
-    color=rgb(config['color']) if config['mode']=='Cor fixa' else bytes(3)
+    if not {'mode','color'} <= set(config) or set(config)-{'mode','color','speed','brightness'}:
+        raise ValueError('A iluminação aceita somente modo, cor, brilho e velocidade.')
+    try:mode=MOUSE_LIGHT_EFFECTS[config['mode']]
+    except (KeyError,TypeError) as exc:raise ValueError('Efeito de iluminação desconhecido.') from exc
+    speed=config.get('speed',2);brightness=config.get('brightness',255)
+    if type(speed) is not int or not 0<=speed<=4:
+        raise ValueError('A velocidade deve ser um nível inteiro de 0 a 4.')
+    if type(brightness) is not int or not 0<=brightness<=255:
+        raise ValueError('O brilho deve ser um inteiro de 0 a 255.')
+    color=rgb(config['color']) if mode else bytes(3)
     def command(code,params):
         raw=bytearray(8);raw[0]=code;raw[1:1+len(params)]=params
         raw[7]=(255-sum(raw[:7]))&255
         return ('control',encode(raw))
-    # Modo 1 e seletor 0 usam RGB direto, sem o artifício de nove cores na paleta.
-    effect=bytes((1,255,0)) if config['mode']=='Cor fixa' else bytes(3)
+    # Formatos por modo extraídos da função de luz do CL-MK043 oficial.
+    # A frequência crescente usa campos distintos, alguns invertidos.
+    if mode==0:effect=bytes(3)
+    elif mode in (1,5,8,11):effect=bytes((mode,brightness,0))
+    elif mode in (2,3,4):effect=bytes((mode,speed,brightness))
+    elif mode in (6,7):effect=bytes((mode,2,4-speed))  # comprimento intermediário
+    elif mode==9:effect=bytes((mode,brightness,(4-speed)<<4))
+    elif mode==10:effect=bytes((mode,brightness,4-speed))
     return [command(0x0c,color),command(0x0d,effect)]

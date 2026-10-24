@@ -54,3 +54,20 @@ O caminho ativo do mouse deixou de chamar `mouse_sequence`: usa `mouse_lighting_
 Cor fixa agora usa RGB direto e seletor de cor única, sem o artifício da paleta repetida da versão anterior. Essa mudança reduz o escopo das escritas e corresponde às funções de iluminação do programa oficial; a nova transferência não foi testada fisicamente nesta revisão.
 
 Antes de uma escrita de teclado, os oito parâmetros atuais são lidos e salvos em `undo-lighting.json`. Ao desfazer, são reaplicados e conferidos; se a leitura de retorno falhar, a cópia de recuperação é conservada. Para mouse, a cópia disponível é o último modo/cor enviado pelo aplicativo, não uma leitura do perfil original. O perfil azul é uma recuperação de iluminação, não restauração de fábrica.
+
+## Revisão 0.4: efeitos nativos do MK043
+
+A função de iluminação do executável oficial CL-MK043 distingue os IDs 0 a 11: desligado, fixo, respiração, neon, onda, reativo, rastro, vai e volta, deslizar, ioiô, mármore e estrela cadente. O controle continua restrito aos registros 0C (RGB) e 0D (efeito), sem interrupt OUT ou escrita de paletas. A tabela antiga de perfil completo não é usada para esses IDs.
+
+Parâmetros decodificados do registro 0D (bytes 1–3), com velocidade `s` entre 0 e 4 e brilho `b` entre 0 e 255:
+
+| IDs | Campos |
+|---|---|
+| 0 | 0, 0, 0 |
+| 1, 5, 8, 11 | modo, b, 0 |
+| 2, 3, 4 | modo, s, b |
+| 6, 7 | modo, 2, 4-s |
+| 9 | modo, b, (4-s)<<4 |
+| 10 | modo, b, 4-s |
+
+O comprimento de rastro é intermediário (2). Seletores de cor ficam em zero; modos que usam paleta dependem da paleta já gravada. A velocidade segue o slider lento–rápido do programa oficial, incluindo campos invertidos. A conferência atual cobre codificação, checksum, limites, importação antiga e comandos permitidos; não confirma aparência ou ritmo físico desses novos modos. Nenhum comando de hardware foi enviado para produzir esta revisão.

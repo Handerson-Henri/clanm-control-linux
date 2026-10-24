@@ -46,7 +46,7 @@ class RecoveryTests(unittest.TestCase):
         backend.save_applied('mouse',{'mode':'Desligado','color':'#0000ff'})
         value=json.loads((backend.STATE/'last-applied.json').read_text())['mouse']
         self.assertEqual(value['dpi'],old['dpi'])
-        self.assertEqual(backend.last_lighting('mouse'),{'mode':'Desligado','color':'#0000ff'})
+        self.assertEqual(backend.last_lighting('mouse'),{'mode':'Desligado','color':'#0000ff','brightness':255,'speed':2})
     def test_keyboard_backup_is_saved_before_write(self):
         c=backend.default_config()['keyboard'];before=bytes((6,2,0,0,0,0,0,255))
         expected=keyboard_packet(c)
@@ -74,3 +74,12 @@ class RecoveryTests(unittest.TestCase):
     def test_no_false_factory_reset(self):
         self.assertFalse(backend.undo_available('mouse'))
         with self.assertRaises(ValueError):backend.undo_lighting('mouse')
+
+    def test_mouse_undo_preserves_effect_speed_and_brightness(self):
+        previous={'mode':'Respiração','color':'#ff0000','speed':4,'brightness':100}
+        backend.save_applied('mouse',previous)
+        self.assertEqual(backend.last_lighting('mouse'),previous)
+        backend.save_undo('mouse',{'config':previous})
+        with patch.object(backend,'send_mouse_lighting') as send:
+            backend.undo_lighting('mouse')
+            self.assertEqual(send.call_args.args[0],previous)

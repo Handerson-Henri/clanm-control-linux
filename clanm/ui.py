@@ -7,7 +7,7 @@ import gi
 gi.require_version('Gtk','3.0')
 from gi.repository import Gtk,Gdk,GLib
 from . import backend
-from .protocol import KEYBOARD_MODES,MOUSE_MODES,ACTIONS,keyboard_packet,mouse_lighting_sequence
+from .protocol import KEYBOARD_MODES,MOUSE_MODES,ACTIONS,keyboard_packet,mouse_lighting_sequence,MOUSE_LIGHT_EFFECTS,MOUSE_SPEED_MODES,MOUSE_BRIGHTNESS_MODES
 
 ROOT=Path(__file__).resolve().parent.parent
 from .design import css,SPACE,THEMES,rgb_token
@@ -160,15 +160,31 @@ class Window(Gtk.Window):
     def mouse_page(self):
         scroll,box=self.page()
         box.pack_start(label('Iluminação do mouse','section'),False,False,0)
-        box.pack_start(label('Cor fixa e desligamento dos LEDs. DPI, sensibilidade e botões permanecem fora destas ações.','sub'),False,False,0)
+        box.pack_start(label('Escolha um efeito nativo e ajuste sua iluminação. DPI, sensibilidade e botões ficam fora destas ações.','sub'),False,False,0)
         self.mpreview=self.preview(box,'mouse')
         grid=self.grid(box)
-        self.m['mode']=combo(['Cor fixa','Desligado']);self.row(grid,0,'Iluminação',self.m['mode'])
+        self.m['mode']=combo(MOUSE_LIGHT_EFFECTS);self.row(grid,0,'Iluminação',self.m['mode'])
         self.m['color']=self.color();self.row(grid,1,'Cor',self.color_panel(self.m,'mouse'))
-        box.pack_start(label('Vermelho confirmado neste mouse. Nenhuma alteração é aplicada ao abrir o aplicativo.','sub'),False,False,0)
+        self.m['brightness']=Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL,0,255,1);self.m['brightness'].set_digits(0)
+        self.row(grid,2,'Brilho · 0 apagado / 255 máximo',self.m['brightness'])
+        self.m['speed']=Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL,0,4,1);self.m['speed'].set_digits(0)
+        self.row(grid,3,'Velocidade · 0 lenta / 4 rápida',self.m['speed'])
+        self.mouse_hint=label('','sub');box.pack_start(self.mouse_hint,False,False,0)
+        self.m['mode'].connect('changed',lambda *_:self.mouse_capabilities())
+        self.mouse_capabilities()
+        box.pack_start(label('Novos efeitos e ritmos ainda precisam de conferência visual no seu mouse. As animações são executadas pelo próprio dispositivo.','sub'),False,False,0)
         self.mapply=Gtk.Button(label='Aplicar no mouse');self.mapply.get_style_context().add_class('suggested-action');self.mapply.connect('clicked',lambda *_:self.apply('mouse'))
         self.action_bar(box,'mouse',self.mapply)
         return scroll
+
+    def mouse_capabilities(self):
+        mode=MOUSE_LIGHT_EFFECTS.get(self.m['mode'].get_active_text(),0)
+        self.m['speed'].set_sensitive(mode in MOUSE_SPEED_MODES)
+        self.m['brightness'].set_sensitive(mode in MOUSE_BRIGHTNESS_MODES)
+        self.m['color'].set_sensitive(mode!=0)
+        hint='A velocidade altera somente o efeito dos LEDs, não o ponteiro.' if mode in MOUSE_SPEED_MODES else 'Este efeito não tem velocidade ajustável no protocolo do mouse.'
+        if mode in (3,4,9,10,11):hint+=' Alguns modos usam também a paleta já existente no mouse.'
+        self.mouse_hint.set_text(hint)
 
     def help_page(self):
         scroll,box=self.page()
@@ -181,22 +197,24 @@ class Window(Gtk.Window):
         box.pack_start(label('Primeiro uso','section'),False,False,0)
         box.pack_start(label('1. Clique em Liberar acesso USB e autentique na janela do sistema.\n2. Se continuar sem acesso, retire e conecte o dispositivo e clique em Detectar.\n3. Escolha um efeito, cor ou perfil e clique em Aplicar.\n4. Confira fisicamente o resultado antes de salvar como seu perfil preferido.'),False,False,0)
         box.pack_start(label('Recuperar uma alteração','section'),False,False,0)
-        box.pack_start(label('Voltar ao azul testado muda somente a iluminação para azul fixo. Desfazer restaura a iluminação anterior salva nesta versão: leitura real de oito parâmetros no teclado, ou último modo/cor enviado pelo aplicativo no mouse. Não há cópia do estado original de fábrica. Desfazer começa a ficar disponível após uma alteração feita nesta versão.','sub'),False,False,0)
+        box.pack_start(label('Voltar ao azul testado muda somente a iluminação para azul fixo. Desfazer restaura a iluminação anterior salva nesta versão: leitura real de oito parâmetros no teclado, ou última iluminação enviada pelo aplicativo no mouse. Não há cópia do estado original de fábrica. Desfazer começa a ficar disponível após uma alteração feita nesta versão.','sub'),False,False,0)
         box.pack_start(label('Sobre esta versão','section'),False,False,0)
-        box.pack_start(label('Versão 0.3 · aplicativo comunitário independente. RGB do teclado baseado no protocolo Evision, adaptado ao CL-TK87. Mouse com codificação CL-MK043 identificada no software oficial. Sem atualização de firmware, captura de digitação ou serviço em segundo plano.','sub'),False,False,0)
+        box.pack_start(label('Versão 0.4 · aplicativo comunitário independente. RGB do teclado baseado no protocolo Evision, adaptado ao CL-TK87. Mouse com codificação CL-MK043 identificada no software oficial. Sem atualização de firmware, captura de digitação ou serviço em segundo plano.','sub'),False,False,0)
         return scroll
 
     def values(self):
         k={'mode':self.k['mode'].get_active_text(),'color':color_value(self.k['color']),
            'brightness':int(self.k['brightness'].get_value()),'speed':int(self.k['speed'].get_value()),
            'direction':self.k['direction'].get_active(),'random':self.k['random'].get_active()}
-        m={'mode':self.m['mode'].get_active_text(),'color':color_value(self.m['color'])}
+        m={'mode':self.m['mode'].get_active_text(),'color':color_value(self.m['color']),'brightness':int(self.m['brightness'].get_value()),'speed':int(self.m['speed'].get_value())}
         return {'keyboard':k,'mouse':m}
 
     def validate(self,values):
-        keyboard_packet(values['keyboard']);mouse_lighting_sequence({key:values['mouse'][key] for key in ('mode','color')})
+        keyboard_packet(values['keyboard']);mouse_lighting_sequence({key:values['mouse'][key] for key in ('mode','color','brightness','speed') if key in values['mouse']})
 
     def populate(self,values):
+        values=copy.deepcopy(values)
+        values['mouse']={'brightness':255,'speed':2,**values['mouse']}
         for controls,kind in [(self.k,'keyboard'),(self.m,'mouse')]:
             for key,value in values[kind].items():
                 if key not in controls:continue
@@ -272,7 +290,7 @@ class Window(Gtk.Window):
         values=self.values()
         if kind=='keyboard':
             values[kind].update(mode='Cor fixa',color='#0000ff',brightness=4,random=False)
-        else:values[kind].update(mode='Cor fixa',color='#0000ff')
+        else:values[kind].update(mode='Cor fixa',color='#0000ff',brightness=255,speed=2)
         self.populate(values)
         self.work(lambda:(backend.apply_keyboard if kind=='keyboard' else backend.apply_mouse)(values[kind]))
 

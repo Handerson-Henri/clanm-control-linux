@@ -91,7 +91,7 @@ def apply_keyboard(config):
 
 def apply_mouse(config):
     operations=mouse_lighting_sequence(config)
-    return send_mouse_lighting(config,operations)
+    return send_mouse_lighting({'brightness':255,'speed':2,**config},operations)
 
 
 def send_mouse_lighting(config,operations):
@@ -136,7 +136,7 @@ def send_mouse_lighting(config,operations):
 def default_config():
     from .protocol import DEFAULT_BUTTONS
     return {'keyboard':{'mode':'Cor fixa','color':'#55aaff','brightness':3,'speed':3,'direction':0,'random':False},
-            'mouse':{'mode':'Cor fixa','color':'#55aaff','dpi':[800,1200,1600,2400,3200,6400],
+            'mouse':{'mode':'Cor fixa','color':'#55aaff','brightness':255,'speed':2,'dpi':[800,1200,1600,2400,3200,6400],
                      'active':1,'count':6,'polling':1000,'lod':2,'debounce':4,'buttons':list(DEFAULT_BUTTONS)}}
 
 
@@ -162,7 +162,7 @@ def save_applied(kind,config):
 def last_lighting(kind):
     try:
         config=json.loads((STATE/'last-applied.json').read_text())[kind]
-        return {key:config[key] for key in ('mode','color')}
+        return {'mode':config['mode'],'color':config['color'],**{key:config[key] for key in ('brightness','speed') if key in config}}
     except (OSError,ValueError,KeyError,TypeError):return None
 
 
